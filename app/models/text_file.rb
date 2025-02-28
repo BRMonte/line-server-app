@@ -1,15 +1,11 @@
 class TextFile
-  FILE_PATH = Rails.root.join("storage", "test.txt").freeze
+  FILE_PATH = Rails.root.join("storage", "test.txt")
 
   def self.total_lines
-    @total_lines ||= count_lines
+    File.readlines(FILE_PATH).size
   end
 
-  private
-
-  def self.count_lines
-    return 0 unless File.exist?(FILE_PATH)
-
-    File.foreach(FILE_PATH).count
+  def self.valid_line_index?(line_index)
+    line_index >= 0 && line_index < total_lines
   end
 end
