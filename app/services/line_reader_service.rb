@@ -1,21 +1,53 @@
 class LineReaderService
-  FILE_PATH = Rails.root.join("storage", "test.txt")
-  CACHE_EXPIRY = 1.day
+  MAX_FILE_SIZE = 7.gigabytes
 
   def self.fetch_line(line_index)
-    Rails.cache.fetch("line_#{line_index}", expires_in: CACHE_EXPIRY) do
-      Rails.logger.debug('*** Method fetch_line entered')
-      return nil unless File.exist?(FILE_PATH)
+    raise "File not found" unless TextFile.exists?
 
-      File.foreach(FILE_PATH).with_index do |line, index|
-        if index == line_index
-          Rails.logger.debug('*** Line found')
-          return line.strip
+    file_size = TextFile.file_size
+
+    if file_size < MAX_FILE_SIZE
+      process_line_sequentially(line_index)
+    else
+      process_line_in_parallel(line_index)
+    end
+  end
+
+  private
+
+  def self.process_line_sequentially(line_index)
+    Rails.logger.debug('*** Method fetch_line entered (Sequential)')
+
+    File.foreach(TextFile::FILE_PATH).with_index do |line, index|
+      return line.strip if index == line_index
+    end
+
+    Rails.logger.debug('*** Line not found')
+    nil
+  end
+
+  def self.process_line_in_parallel(line_index)
+    Rails.logger.debug('*** Method fetch_line entered (Parallel)')
+
+    chunk_size = (TextFile.total_lines / 4.0).ceil
+    jobs = []
+    start_index = 0
+
+    4.times do |i|
+      jobs << Thread.new do
+        start_line = start_index + (i * chunk_size)
+        end_line = start_index + ((i + 1) * chunk_size) - 1
+
+        File.foreach(TextFile::FILE_PATH).with_index do |line, index|
+          next unless index.between?(start_line, end_line)
+          return line.strip if index == line_index
         end
       end
-
-      Rails.logger.debug('*** Line not found')
-      nil
     end
+
+    result = nil
+    jobs.each { |job| result = job.value if job.value }
+
+    result
   end
 end
