@@ -1,4 +1,8 @@
+require 'singleton'
+
 class TextFile
+  include Singleton
+
   FILE_PATH = Rails.root.join("storage", "test.txt")
 
   def self.file_size
