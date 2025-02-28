@@ -2,7 +2,7 @@
 
 <%= form_with id: "line-form", method: :get, local: true do |form| %>
   <div>
-    <%= form.label :id, "Enter Line ID:" %>
+    <%= form.label :id, "Enter Line index:" %>
     <%= form.number_field :id, required: true, min: 0, id: "line-id-input" %>
   </div>
 
@@ -13,6 +13,29 @@
 
 <div id="line-content">
 </div>
+
+<h1>Cached Lines</h1>
+
+<% if @cached_lines.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Line Index</th>
+        <th>Content</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @cached_lines.each do |key, content| %>
+        <tr>
+          <td><%= key.gsub('line_', '') %></td>
+          <td><%= content %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No lines cached yet.</p>
+<% end %>
 
 <script>
   document.getElementById('line-form').addEventListener('submit', function(event) {
