@@ -1,2 +1,49 @@
-<h1>Lines#index</h1>
-<p>Find me in app/views/lines/index.html.erb</p>
+<h1>Look for the lines content</h1>
+
+<%= form_with id: "line-form", method: :get, local: true do |form| %>
+  <div>
+    <%= form.label :id, "Enter Line ID:" %>
+    <%= form.number_field :id, required: true, min: 0, id: "line-id-input" %>
+  </div>
+
+  <div>
+    <%= form.submit "Get Line" %>
+  </div>
+<% end %>
+
+<div id="line-content">
+</div>
+
+<script>
+  document.getElementById('line-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const lineId = document.getElementById('line-id-input').value;
+    const url = `<%= api_v1_lines_path %>/${lineId}`;
+
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const lineContentDiv = document.getElementById('line-content');
+        if (data.error) {
+          lineContentDiv.innerHTML = `<h3>Error:</h3><p>${data.error}</p>`;
+        } else {
+          lineContentDiv.innerHTML = `<h3>Line Content:</h3><p>${data.content}</p>`;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('line-content').innerHTML = `<h3>Error:</h3><p>Something went wrong. Please try again.</p>`;
+      });
+  });
+</script>
