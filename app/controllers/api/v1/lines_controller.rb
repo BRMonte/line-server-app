@@ -1,14 +1,7 @@
 module Api
   module V1
     class LinesController < ApplicationController
-      def index
-
-        cached_keys = Rails.cache.fetch("cached_line_keys") { [] }
-
-        @cached_lines = cached_keys.each_with_object({}) do |key, hash|
-          hash[key] = Rails.cache.read(key)
-        end
-      end
+      def index; end
 
       def show
         line_index = params[:id].to_i
