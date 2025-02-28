@@ -5,9 +5,9 @@ module Api
       end
 
       def show
-        line_index = params[:line_index].to_i
+        line_index = params[:id].to_i
 
-        if line_index.negative? || line_index >= TextFile.total_lines
+        unless TextFile.valid_line_index?(line_index)
           render json: { error: "Line index out of range" }, status: :unprocessable_entity
           return
         end
