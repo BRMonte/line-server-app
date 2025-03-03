@@ -8,10 +8,7 @@ module Api
       def show
         line_index = line_params[:id].to_i
 
-        unless TextFile.instance.valid_line_index?(line_index)
-          Rails.logger.warn('*** Line index out of range')
-          return render json: { error: "Line index out of range" }, status: :unprocessable_entity
-        end
+        return if validate_line_index(line_index)
 
         line_content = LineCaching.fetch_or_cache(line_index, line_reader_service: LineReaderService)
 
@@ -28,8 +25,18 @@ module Api
       end
 
       private
+
       def line_params
         params.permit(:id)
+      end
+
+      def validate_line_index(line_index)
+        unless TextFile.instance.valid_line_index?(line_index)
+          Rails.logger.warn('*** Line index out of range')
+          render json: { error: "Line index out of range" }, status: :unprocessable_entity
+          return true
+        end
+        false
       end
     end
   end
