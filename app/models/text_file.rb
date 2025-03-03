@@ -3,7 +3,13 @@ require 'singleton'
 class TextFile
   include Singleton
 
+  attr_reader :file_path
+
   FILE_PATH = Rails.root.join("storage", "test.txt")
+
+  def initialize(file_path = ENV['TEXT_FILE_PATH'] || Rails.root.join("storage", "test.txt"))
+    @file_path = file_path
+  end
 
   def file_size
     size_in_bytes = File.size(FILE_PATH)
