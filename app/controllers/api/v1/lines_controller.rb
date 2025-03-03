@@ -1,6 +1,8 @@
 module Api
   module V1
     class LinesController < ApplicationController
+      include LineCaching
+
       def index; end
 
       def show
@@ -11,7 +13,7 @@ module Api
           return render json: { error: "Line index out of range" }, status: :unprocessable_entity
         end
 
-        line_content = fetch_or_cache_line(line_index)
+        line_content = LineCaching.fetch_or_cache(line_index, line_reader_service: LineReaderService)
 
         if line_content.present?
           Rails.logger.info("*** Line content found -> #{line_content}")
