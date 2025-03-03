@@ -6,7 +6,10 @@ module Api
       def show
         line_index = params[:id].to_i
 
-        validate_line_index(line_index)
+        unless TextFile.instance.valid_line_index?(line_index)
+          Rails.logger.warn('*** Line index out of range')
+          return render json: { error: "Line index out of range" }, status: :unprocessable_entity
+        end
 
         line_content = fetch_or_cache_line(line_index)
 
@@ -23,13 +26,6 @@ module Api
       end
 
       private
-
-      def validate_line_index(line_index)
-        return if TextFile.instance.valid_line_index?(line_index)
-
-        Rails.logger.warn { '*** Line index out of range' }
-        render json: { error: "Line index out of range" }, status: :unprocessable_entity
-      end
 
       def fetch_or_cache_line(line_index)
         cache_key = "line_#{line_index}"
