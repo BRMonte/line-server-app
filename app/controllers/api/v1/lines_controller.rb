@@ -4,7 +4,7 @@ module Api
       def index; end
 
       def show
-        line_index = params[:id].to_i
+        line_index = line_params[:id].to_i
 
         unless TextFile.instance.valid_line_index?(line_index)
           Rails.logger.warn('*** Line index out of range')
@@ -37,6 +37,10 @@ module Api
           end
           content
         end
+      end
+
+      def line_params
+        params.permit(:id)
       end
     end
   end
