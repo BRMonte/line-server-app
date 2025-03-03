@@ -28,19 +28,6 @@ module Api
       end
 
       private
-
-      def fetch_or_cache_line(line_index)
-        cache_key = "line_#{line_index}"
-
-        Rails.cache.fetch(cache_key, expires_in: 1.day) do
-          content = LineReaderService.fetch_line(line_index)
-          if content.present?
-            Rails.logger.debug("*** Caching line: #{cache_key} -> #{content.inspect}")
-          end
-          content
-        end
-      end
-
       def line_params
         params.permit(:id)
       end
