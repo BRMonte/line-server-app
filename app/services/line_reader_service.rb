@@ -25,7 +25,7 @@ class LineReaderService
   def self.process_sequentially(line_index)
     Rails.logger.debug('*** Processing sequentially')
 
-    File.foreach(@text_file.class::FILE_PATH).with_index do |line, index|
+    File.foreach(@text_file.file_path).with_index do |line, index|
       return line.strip if index == line_index
     end
 
@@ -45,7 +45,7 @@ class LineReaderService
         start_line = start_index + (i * chunk_size)
         end_line = start_index + ((i + 1) * chunk_size) - 1
 
-        File.foreach(@text_file.class::FILE_PATH).with_index do |line, index|
+        File.foreach(@text_file.file_path).with_index do |line, index|
           next unless index.between?(start_line, end_line)
           return line.strip if index == line_index
         end
