@@ -58,8 +58,10 @@ $ bundle exec rspec
 
 ## Improvements
 ```
-1- proper testing for the file handling
+1- Proper testing for the file handling
 2- Redis for caching
 3- Sidekiq for asynchronous processing
 4- Cloud for file storage
+5- Better organization for errors and logs and maybe more isolated processing
+6- I would think of better ways to search over big files
 ```
