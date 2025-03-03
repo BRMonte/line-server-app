@@ -19,14 +19,15 @@ module Api
 
           render json: { error: "Line not found" }, status: :not_found
         end
-      rescue ClientError => e
+      rescue => e
         logger.error { "*** #{e}: #{e.message}" }
+        render json: { error: "Internal Server Error" }, status: :internal_server_error
       end
 
       private
 
       def validate_line_index(line_index)
-        return if TextFile.valid_line_index?(line_index)
+        return if TextFile.instance.valid_line_index?(line_index)
 
         Rails.logger.warn { '*** Line index out of range' }
 
@@ -38,15 +39,21 @@ module Api
 
         Rails.cache.fetch(cache_key, expires_in: 1.day) do
           content = LineReaderService.fetch_line(line_index)
-          track_cache_key(cache_key) if content.present?
+          if content.present?
+            track_cache_key(cache_key)
+            Rails.logger.debug("*** Caching line: #{cache_key} -> #{content.inspect}")
+          end
           content
         end
       end
 
       def track_cache_key(key)
-        cached_keys = Rails.cache.fetch("cached_line_keys") { [] }
-        cached_keys << key unless cached_keys.include?(key)
+        cached_keys = Rails.cache.read("cached_line_keys") || []
+        cached_keys |= [key]
+
         Rails.cache.write("cached_line_keys", cached_keys)
+
+        Rails.logger.debug("*** Cached Keys (AFTER SAVE) -> #{Rails.cache.read("cached_line_keys").inspect}")
       end
     end
   end
