@@ -24,7 +24,8 @@ Clone this repo:
 $ git clone git@github.com:{USER_NAME}/line-server-app.git
 ```
 Make the Shell Scripts Executable:
-### Navigate to the root folder of your cloned app (where build.sh and run.sh are located). You should be in the same directory as the .sh files. Run the following commands in the terminal inside this directory to make the scripts executable:
+
+Navigate to the root folder of your cloned app (where build.sh and run.sh are located). You should be in the same directory as the .sh files. Run the following commands in the terminal inside this directory to make the scripts executable:
 ```
 $ chmod +x build.sh
 $ chmod +x run.sh
