@@ -14,36 +14,49 @@
 <div id="line-content">
 </div>
 
+<h3 id="spinner" style="margin-top: 30px; color: red;">
+</h3>
+
 <script>
   document.getElementById('line-form').addEventListener('submit', function(event) {
     event.preventDefault();
     const lineId = document.getElementById('line-id-input').value;
     const url = `<%= api_v1_lines_path %>/${lineId}`;
+    const spinner = document.getElementById('spinner');
+    const lineContentDiv = document.getElementById('line-content');
 
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        const lineContentDiv = document.getElementById('line-content');
-        if (data.error) {
-          lineContentDiv.innerHTML = `<h3>Error:</h3><p>${data.error}</p>`;
-        } else {
-          lineContentDiv.innerHTML = `<h3>Line Content:</h3><p>${data.content}</p>`;
+    lineContentDiv.innerHTML = 'Loading';
+
+    setTimeout(() => {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         }
       })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('line-content').innerHTML = `<h3>Error:</h3><p>Something went wrong. Please try again.</p>`;
-      });
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(err.error || 'Network response was not ok');
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            lineContentDiv.innerHTML = `<h3>Error:</h3><p>${data.error}</p>`;
+          } else {
+            lineContentDiv.innerHTML = `<h3>Line Content:</h3><p>${data.content}</p>`;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          lineContentDiv.innerHTML = `<h3>Error:</h3><p>${error.message}</p>`;
+        })
+        .finally(() => {
+          spinner.style.display = 'none';
+        });
+    }, 4000);
   });
 </script>
