@@ -48,7 +48,7 @@ $ bundle exec rspec
 
 ## How this app works
 ```
-1- for small files it simply iterates over each line and retrieves the data
+1- for small files it makes sequential search
 2- for big files it perform search concurrently into chunks
 3- for even bigger files the best strategy would be to use indexing (e.g., Lucene, Elasticsearch) or binary search on sorted data
 4- for just a few users this app uses in-memory caching for frequently accessed data
